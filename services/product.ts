@@ -1,26 +1,29 @@
-import API from "@/libs/axios";
-import { ProductResponse, BestSellingResponse } from "@/types/product";
+import axios from "axios";
+import { Product } from "../types/product";
 
-// GET ALL PRODUCTS
-export const getProducts = async () => {
-  const res = await API.get("/product/");
-  return res.data;
+const API_URL = "http://localhost:5000/api/v2/product"; // backend route
+
+export const getAllProducts = async (): Promise<Product[]> => {
+  const res = await axios.get(`${API_URL}/`);
+  return res.data.data;
 };
 
-// GET PRODUCT BY ID
-export const getProductById = async (id: string) => {
-  const res = await API.get(`/product/${id}`);
-  return res.data;
+export const getCategoryProducts = async (category?: string): Promise<Product[]> => {
+  if (!category) {
+    console.error("getCategoryProducts: category undefined!");
+    return []; // fallback empty array
+  }
+
+  const res = await axios.get(`${API_URL}/category/${category.toLowerCase()}`);
+  return res.data.data;
 };
 
-// GET CATEGORY PRODUCTS
-export const getCategoryProducts = async (category: string) => {
-  const res = await API.get(`/product/category/${category}`);
-  return res.data;
+export const getProductById = async (id: string): Promise<Product> => {
+  const res = await axios.get(`${API_URL}/${id}`);
+  return res.data.data;
 };
 
-// GET BEST SELLING PRODUCTS
-export const getBestSellingProducts = async () => {
-  const res = await API.get("/product/best-selling");
-  return res.data;
+export const getBestSellingProducts = async (): Promise<Product[]> => {
+  const res = await axios.get(`${API_URL}/best-selling`);
+  return res.data.products;
 };
