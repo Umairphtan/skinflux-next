@@ -14,11 +14,11 @@ export const getCategoryProducts = async (category: string): Promise<Product[]> 
   return res.data.data;
 };
 
-// Get single product by ID
 export const getProductById = async (id: string): Promise<Product> => {
-  if (!id) throw new Error("Product ID required");
+  if (!id) throw new Error("Product ID is required");
   const res = await API.get(`/product/${id}`);
-  return res.data.data;
+  console.log("Product API Response:", res.data); // debug backend
+  return res.data.data; // adjust if backend returns { product: {...} }
 };
 
 // Get best selling products
