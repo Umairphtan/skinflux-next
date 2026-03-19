@@ -4,10 +4,10 @@ export interface Product {
   description: string;
   price: number;
   category: string;
-  image: string;
+  image?: string;
   stock: number;
   sold: number;
   status: "in-stock" | "out-of-stock" | "sold-out";
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
