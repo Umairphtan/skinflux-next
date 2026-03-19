@@ -1,56 +1,51 @@
-import { useState, useEffect } from "react";
-import { Product } from "@/types/product";
+"use client";
+
+import { useEffect, useState } from "react";
 import {
-  getProducts,
+  getAllProducts,
   getCategoryProducts,
+  getProductById,
   getBestSellingProducts,
 } from "@/services/product";
+import { Product } from "@/types/product";
 
-export const useProducts = (category?: string) => {
+export const useProducts = (type?: string, value?: string) => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
+  const fetchData = async () => {
     setLoading(true);
-    const fetchData = async () => {
-      try {
-        let res;
-        if (category) {
-          res = await getCategoryProducts(category);
-          setProducts(res.data);
-        } else {
-          res = await getProducts();
-          setProducts(res.data);
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
+    try {
+      let res;
+
+      if (type === "category" && value) {
+        res = await getCategoryProducts(value);
+        setProducts(res);
+      } 
+      else if (type === "single" && value) {
+        const res = await getProductById(value);
+        setProduct(res);
+      } 
+      else if (type === "best") {
+        res = await getBestSellingProducts();
+        setProducts(res);
+      } 
+      else {
+        res = await getAllProducts();
+        setProducts(res);
       }
-    };
-    fetchData();
-  }, [category]);
 
-  return { products, loading };
-};
-
-export const useBestSelling = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchBest = async () => {
-      try {
-        const res = await getBestSellingProducts();
-        setProducts(res.products);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchBest();
-  }, []);
+    fetchData();
+  }, [type, value]);
 
-  return { products, loading };
+  return { products, product, loading };
 };

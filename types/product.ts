@@ -4,21 +4,10 @@ export interface Product {
   description: string;
   price: number;
   category: string;
+  image?: string;
   stock: number;
   sold: number;
-  status: string;
-  image: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface ProductResponse {
-  success: boolean;
-  message: string;
-  data: Product | Product[];
-}
-
-export interface BestSellingResponse {
-  success: boolean;
-  products: Product[];
+  status: "in-stock" | "out-of-stock" | "sold-out";
+  createdAt?: string;
+  updatedAt?: string;
 }
