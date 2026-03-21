@@ -1,7 +1,8 @@
 import Link from "next/link";
 
 const featureCategories = [
-  { title: "Shampoo", image: "/images/categories/shampoo.jpg" },
+  { title: "Shampoo", image: "/skin1.jpg" },
+    { title: "Hair__care", image: "/skin1.jpg" },
   { title: "Serum", image: "/images/categories/serum.jpg" },
   { title: "FaceWash", image: "/images/categories/facewash.jpg" },
   { title: "Oil", image: "/images/categories/oil.jpg" },

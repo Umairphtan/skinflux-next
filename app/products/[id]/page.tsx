@@ -6,7 +6,7 @@ import { getProductById } from "@/services/product";
 import { Product } from "@/types/product";
 
 export default function ProductPage() {
-  const { id} = useParams<{ id: string }>();
+  const { id } = useParams() as { id?: string };
   const router = useRouter();
 
   const [product, setProduct] = useState<Product | null>(null);
@@ -37,10 +37,16 @@ export default function ProductPage() {
   if (error) return <div className="p-6 mt-20 text-red-500">{error}</div>;
   if (!product) return <div className="p-6 mt-20">Product not found</div>;
 
+  const imageUrl = product.image
+    ? product.image.startsWith("http")
+      ? product.image
+      : `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/${product.image}`
+    : "/default.jpg";
+
   return (
     <div className="p-6 mt-20 max-w-4xl mx-auto">
       <img
-        src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/product/image/${product.image}`}
+        src={imageUrl}
         alt={product.title}
         className="w-full h-96 object-cover rounded"
       />
