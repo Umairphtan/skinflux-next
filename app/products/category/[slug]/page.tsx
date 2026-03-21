@@ -46,7 +46,7 @@ export default function CategoryPage() {
               ? product.image.startsWith("http")
                 ? product.image
                 : `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/${product.image}`
-              : "/default.jpg"; // default image if missing
+              : "/default.jpg"; 
 
             return (
               <Link
