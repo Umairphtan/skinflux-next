@@ -26,3 +26,9 @@ export const getBestSellingProducts = async (): Promise<Product[]> => {
   const res = await API.get("/product/best-selling");
   return res.data.products;
 };
+
+// New Arrivals
+export const getNewProducts = async (): Promise<Product[]> => {
+  const res = await API.get("/product/new");
+  return res.data.products;
+};

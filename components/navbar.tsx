@@ -2,8 +2,9 @@
 
 import Link from "next/link"
 import { useState } from "react"
-import { ShoppingCart, User, Menu, X } from "lucide-react"
+import { ShoppingCart, User, Menu, X, LogOut } from "lucide-react"
 import { usePathname } from "next/navigation"
+import { useAuth } from "@/context/auth"
 
 export const navLinks = [
   { name: "Home", href: "/" },
@@ -14,7 +15,8 @@ export const navLinks = [
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
-  const pathname = usePathname() // active link highlight
+  const pathname = usePathname()
+  const { user, logout, isAuth } = useAuth() // ✅ auth context
 
   return (
     <header className="w-full border-b bg-white/90 backdrop-blur sticky top-0 z-50">
@@ -45,10 +47,26 @@ export default function Navbar() {
 
           {/* RIGHT SIDE */}
           <div className="hidden md:flex items-center gap-6">
-            <Link href="/login" className="flex items-center gap-2 hover:text-pink-600">
-              <User size={28} />
-              Login
-            </Link>
+            {isAuth ? (
+              <>
+                <span className="flex items-center gap-2 text-gray-700">
+                  <User size={28} />
+                  {user?.username}
+                </span>
+                <button
+                  onClick={logout}
+                  className="flex items-center gap-2 text-pink-600 hover:text-pink-500"
+                >
+                  <LogOut size={24} />
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link href="/login" className="flex items-center gap-2 hover:text-pink-600">
+                <User size={28} />
+                Login
+              </Link>
+            )}
 
             <Link href="/cart" className="relative hover:text-pink-600">
               <ShoppingCart size={24} />
@@ -75,7 +93,6 @@ export default function Navbar() {
         }`}
       >
         <div className="px-6 pb-6 flex flex-col gap-4 bg-white">
-
           {navLinks.map((link) => (
             <Link
               key={link.name}
@@ -91,9 +108,18 @@ export default function Navbar() {
             </Link>
           ))}
 
-          <Link href="/login" onClick={() => setMobileOpen(false)}>
-            Login
-          </Link>
+          {isAuth ? (
+            <>
+              <span className="text-gray-700">{user?.username}</span>
+              <button onClick={() => { logout(); setMobileOpen(false); }} className="text-pink-600">
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link href="/login" onClick={() => setMobileOpen(false)}>
+              Login
+            </Link>
+          )}
 
           <Link href="/cart" onClick={() => setMobileOpen(false)}>
             Cart
