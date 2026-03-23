@@ -1,28 +1,27 @@
-import API from "@/libs/axios";
+import API from "../libs/axios";
+import { IUser } from "../types/user";
 
-type SignupData = { username: string; email: string; password: string };
-type LoginData = { email: string; password: string };
-
-export type AuthResponse = {
-  user: { _id: string; username: string; email: string; role: string };
-  token: string;
+export interface AuthResponse {
+  success: boolean;
   message: string;
+  token?: string;
+  user?: IUser;
+}
+
+// Signup
+export const signup = async (username: string, email: string, password: string) => {
+  const { data } = await API.post<AuthResponse>("/user/signup", { username, email, password });
+  return data;
 };
 
-// SIGNUP
-export const signupUser = async (data: SignupData): Promise<AuthResponse> => {
-  const res = await API.post("/user/signup", data);
-  return res.data;
+// Login
+export const login = async (email: string, password: string) => {
+  const { data } = await API.post<AuthResponse>("/user/login", { email, password });
+  return data;
 };
 
-// LOGIN
-export const loginUser = async (data: LoginData): Promise<AuthResponse> => {
-  const res = await API.post("/user/login", data);
-  return res.data;
-};
-
-// LOGOUT
-export const logoutUser = async () => {
-  const res = await API.post("/user/logout");
-  return res.data;
+// Logout
+export const logout = async () => {
+  const { data } = await API.post<AuthResponse>("/user/logout");
+  return data;
 };

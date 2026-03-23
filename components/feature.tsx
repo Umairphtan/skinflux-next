@@ -1,13 +1,23 @@
 import Link from "next/link";
 
 const featureCategories = [
-  { title: "Shampoo", image: "/skin1.jpg" },
-    { title: "Hair__care", image: "/skin1.jpg" },
-  { title: "Serum", image: "/images/categories/serum.jpg" },
-  { title: "FaceWash", image: "/images/categories/facewash.jpg" },
-  { title: "Oil", image: "/images/categories/oil.jpg" },
-  { title: "Supplement", image: "/images/categories/supplement.jpg" },
-  { title: "Cream", image: "/images/categories/cream.jpg" },
+  { title: "SHAMPOO", image: "/skin1.jpg" },
+  { title: "HAIR_CARE", image: "/skin1.jpg" },
+  { title: "serum", image: "/images/categories/serum.jpg" },
+  { title: "FACEWASH", image: "/images/categories/facewash.jpg" },
+  { title: "OIL", image: "/images/categories/oil.jpg" },
+  { title: "SUPPLEMENTS", image: "/images/categories/supplement.jpg" },
+  { title: "CREAM", image: "/images/categories/cream.jpg" },
+  { title: "ACNE_CARE", image: "/images/categories/cream.jpg" },
+  { title: "WHITENING", image: "/images/categories/cream.jpg" },
+  { title: "SUNBLOCK", image: "/images/categories/cream.jpg" },
+  { title: "SENSITIVE_SKIN", image: "/images/categories/cream.jpg" },
+  { title: "WEIGHT_LOSE", image: "/images/categories/cream.jpg" },
+  
+
+
+
+
 ];
 
 export default function FeatureCategories() {
