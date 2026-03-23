@@ -1,74 +1,102 @@
 "use client";
 
 import { useState } from "react";
-import { signupUser } from "@/services/user";
-import { motion } from "framer-motion";
-import { useAuth } from "@/context/auth";
-import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/authcontex";
 
-export default function SignupPage() {
-  const [form, setForm] = useState({ username: "", email: "", password: "" });
+export default function Signup() {
+  const { signup } = useAuth();
+
+  const [form, setForm] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
+
   const [loading, setLoading] = useState(false);
-
-  const { login } = useAuth(); //
-  const router = useRouter();
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-    setLoading(true);
-    try {
-      const res = await signupUser(form);
 
-      login(res.user, res.token); //
+    setError("");
 
-      alert("Signup Successful ");
-      router.push("/"); // redirect to home
-    } catch (err: any) {
-      alert(err.response?.data?.message || "Signup failed");
+
+    if (!form.username || !form.email || !form.password) {
+      setError("All fields are required");
+      return;
     }
-    setLoading(false);
+
+    if (form.password.length < 6) {
+      setError("Password must be at least 6 characters");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      console.log("Signup Data:", form); 
+
+      await signup(form);
+
+      alert("Signup successful");
+
+    } catch (err: any) {
+      console.log("ERROR:", err.response?.data); 
+
+      setError(
+        err.response?.data?.message || "Signup failed"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#fff0f5] to-[#ffe6f0]">
-      <motion.div className="bg-white rounded-2xl shadow-xl p-10 w-full max-w-md">
-        <h2 className="text-3xl font-bold text-center text-[#d63384] mb-6">
-          Create New Account
-        </h2>
-        <form className="space-y-5" onSubmit={handleSubmit}>
-          <motion.input
-            type="text"
-            placeholder="Username"
-            value={form.username}
-            required
-            onChange={(e) => setForm({ ...form, username: e.target.value })}
-            className="w-full px-5 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-300"
-          />
-          <motion.input
-            type="email"
-            placeholder="Email"
-            value={form.email}
-            required
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-            className="w-full px-5 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-300"
-          />
-          <motion.input
-            type="password"
-            placeholder="Password"
-            value={form.password}
-            required
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
-            className="w-full px-5 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-300"
-          />
-          <motion.button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 rounded-xl bg-pink-400 text-white font-semibold text-lg"
-          >
-            {loading ? "Creating..." : "Sign Up"}
-          </motion.button>
-        </form>
-      </motion.div>
-    </div>
+    <form
+      onSubmit={handleSubmit}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "10px",
+        width: "300px",
+      }}
+    >
+      <input
+        type="text"
+        placeholder="Username"
+        value={form.username}
+        onChange={(e) =>
+          setForm({ ...form, username: e.target.value })
+        }
+      />
+
+      <input
+        type="email"
+        placeholder="Email"
+        value={form.email}
+        onChange={(e) =>
+          setForm({ ...form, email: e.target.value })
+        }
+      />
+
+      <input
+        type="password"
+        placeholder="Password"
+        value={form.password}
+        onChange={(e) =>
+          setForm({ ...form, password: e.target.value })
+        }
+      />
+
+      <button type="submit" disabled={loading}>
+        {loading ? "Signing up..." : "Signup"}
+      </button>
+
+      {error && (
+        <p style={{ color: "red" }}>
+          {error}
+        </p>
+      )}
+    </form>
   );
 }
