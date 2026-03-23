@@ -1,27 +1,50 @@
 "use client";
 
-import { addToCart } from "@/services/cart";
+import { useState } from "react";
+import { useCart } from "@/context/cartcontext";
 
-export default function AddToCartButton({
-  productId,
-}: {
+interface Props {
   productId: string;
-}) {
-  const handleAdd = async () => {
+  stock: number;
+}
+
+export default function AddToCartButton({ productId, stock }: Props) {
+  const [loading, setLoading] = useState(false);
+  const [added, setAdded] = useState(false); 
+  const { addItem } = useCart();
+
+  const handleAddToCart = async () => {
+    if (stock === 0) return;
     try {
-      await addToCart(productId, 1);
-      alert("Added to cart");
-    } catch (err) {
+      setLoading(true);
+      await addItem(productId, 1); 
+      setAdded(true); 
+      setTimeout(() => setAdded(false), 2000); 
+    } catch (err: any) {
+      if (err.response?.status === 401) {
+        alert("Please login to add products to your cart");
+        return;
+      }
       console.error(err);
+      alert(err.response?.data?.message || "Failed to add to cart 😢");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <button
-      onClick={handleAdd}
-      className="mt-2 bg-black text-white px-4 py-2 rounded"
+      onClick={handleAddToCart}
+      disabled={loading || stock === 0}
+      className={`mt-3 w-full py-2 rounded-lg font-medium transition ${
+        stock === 0
+          ? "bg-gray-400 cursor-not-allowed"
+          : added
+          ? "bg-green-500 text-white cursor-default"
+          : "bg-pink-500 hover:bg-pink-600 text-white"
+      }`}
     >
-      Add to Cart
+      {loading ? "Adding..." : added ? "Added ✅" : "Add to Cart"}
     </button>
   );
 }
