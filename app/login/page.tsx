@@ -2,9 +2,12 @@
 
 import { useState } from "react";
 import { useAuth } from "@/context/authcontex";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
   const { login } = useAuth();
+  const router = useRouter();
 
   const [form, setForm] = useState({
     email: "",
@@ -16,10 +19,8 @@ export default function Login() {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-
     setError("");
 
-    // ✅ basic validation
     if (!form.email || !form.password) {
       setError("Email and password are required");
       return;
@@ -28,54 +29,97 @@ export default function Login() {
     try {
       setLoading(true);
 
-      console.log("Sending Data:", form); // 🔥 debug
-
       await login(form);
+
+  
+      setForm({
+        email: "",
+        password: "",
+      });
 
       alert("Login successful");
 
-    } catch (err: any) {
-      console.log("ERROR:", err.response?.data); // 🔥 main debug
+  
+      router.push("/");
 
-      setError(
-        err.response?.data?.message || "Something went wrong"
-      );
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "10px", width: "300px" }}>
-      
-      <input
-        type="email"
-        placeholder="Email"
-        value={form.email}
-        onChange={(e) =>
-          setForm({ ...form, email: e.target.value })
-        }
-      />
+    <div className="min-h-screen flex items-center justify-center bg-pink-50 px-4">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg space-y-5"
+      >
+        {/* Heading */}
+        <div className="text-center">
+          <h2 className="text-2xl font-semibold text-pink-600">
+            Welcome Back 💖
+          </h2>
+          <p className="text-sm text-gray-500">
+            Login to your account
+          </p>
+        </div>
 
-      <input
-        type="password"
-        placeholder="Password"
-        value={form.password}
-        onChange={(e) =>
-          setForm({ ...form, password: e.target.value })
-        }
-      />
+        {/* Email */}
+        <div>
+          <label className="text-sm text-gray-600">Email</label>
+          <input
+            type="email"
+            placeholder="Enter your email"
+            value={form.email}
+            onChange={(e) =>
+              setForm({ ...form, email: e.target.value })
+            }
+            className="w-full mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300"
+          />
+        </div>
 
-      <button type="submit" disabled={loading}>
-        {loading ? "Logging in..." : "Login"}
-      </button>
+        {/* Password */}
+        <div>
+          <label className="text-sm text-gray-600">Password</label>
+          <input
+            type="password"
+            placeholder="Enter your password"
+            value={form.password}
+            onChange={(e) =>
+              setForm({ ...form, password: e.target.value })
+            }
+            className="w-full mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300"
+          />
+        </div>
 
-      {/* ✅ error show */}
-      {error && (
-        <p style={{ color: "red" }}>
-          {error}
+        {/* Error */}
+        {error && (
+          <p className="text-red-500 text-sm text-center">
+            {error}
+          </p>
+        )}
+
+        {/* Button */}
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-pink-500 hover:bg-pink-600 text-white py-3 rounded-lg font-medium transition duration-300"
+        >
+          {loading ? "Logging in..." : "Login"}
+        </button>
+
+        {/* Footer ✅ FIXED */}
+        <p className="text-center text-sm text-gray-500">
+          Don’t have an account?{" "}
+          <Link
+            href="/signup"
+            className="text-pink-500 hover:underline"
+          >
+            Sign up
+          </Link>
         </p>
-      )}
-    </form>
+      </form>
+    </div>
   );
 }
