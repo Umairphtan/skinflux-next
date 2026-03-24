@@ -10,23 +10,24 @@ interface Props {
 
 export default function AddToCartButton({ productId, stock }: Props) {
   const [loading, setLoading] = useState(false);
-  const [added, setAdded] = useState(false); 
+  const [added, setAdded] = useState(false);
   const { addItem } = useCart();
 
   const handleAddToCart = async () => {
     if (stock === 0) return;
     try {
       setLoading(true);
-      await addItem(productId, 1); 
-      setAdded(true); 
-      setTimeout(() => setAdded(false), 2000); 
+      await addItem(productId, 1);
+      setAdded(true);
+      alert("Product added to cart ✅");
+      setTimeout(() => setAdded(false), 2000);
     } catch (err: any) {
-      if (err.response?.status === 401) {
+      if (err.message === "Unauthorized") {
         alert("Please login to add products to your cart");
         return;
       }
       console.error(err);
-      alert(err.response?.data?.message || "Failed to add to cart 😢");
+      alert("Failed to add to cart 😢");
     } finally {
       setLoading(false);
     }
