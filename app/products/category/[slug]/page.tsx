@@ -6,6 +6,7 @@ import Link from "next/link";
 import { getCategoryProducts } from "@/services/product";
 import { Product } from "@/types/product";
 import AddToCartButton from "@/components/addtocartbtn";
+import BuyNowButton from "@/components/buynow"; // 🔹 Import
 
 export default function CategoryPage() {
   const { slug } = useParams() as { slug?: string };
@@ -63,11 +64,17 @@ export default function CategoryPage() {
                   <p className="text-gray-700 mt-1">Rs {product.price}</p>
                 </Link>
 
-                {/* Add to Cart Button */}
-                <AddToCartButton
-                  productId={product._id}
-                  stock={product.stock || 0}
-                />
+                {/* Buttons */}
+                <div className="mt-2 flex gap-2">
+                  <AddToCartButton
+                    productId={product._id}
+                    stock={product.stock || 0}
+                  />
+                  <BuyNowButton
+                    productId={product._id}
+                    price={product.price || 0} // make sure price exists
+                  />
+                </div>
               </div>
             );
           })}
