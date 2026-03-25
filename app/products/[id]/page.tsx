@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { getProductById } from "@/services/product";
 import { Product } from "@/types/product";
+import AddToCartButton from "@/components/addtocartbtn"; 
 
 export default function ProductPage() {
   const { id } = useParams() as { id?: string };
@@ -44,24 +45,35 @@ export default function ProductPage() {
     : "/default.jpg";
 
   return (
-    <div className="p-6 mt-20 max-w-4xl mx-auto">
+    <div className="p-6 mt-20 max-w-4xl mx-auto flex flex-col md:flex-row gap-6">
+      {/* Product Image */}
       <img
         src={imageUrl}
         alt={product.title}
-        className="w-full h-96 object-cover rounded"
+        className="w-full md:w-1/2 h-96 object-cover rounded"
       />
-      <h1 className="text-3xl font-bold mt-4">{product.title}</h1>
-      <p className="mt-2 text-gray-700">{product.description}</p>
-      <p className="text-xl font-semibold mt-4">Rs {product.price}</p>
-      <p className="mt-2 text-sm">
-        {product.stock > 0 ? "In stock" : "Out of stock"}
-      </p>
-      <button
-        onClick={() => router.back()}
-        className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-      >
-        Go Back
-      </button>
+
+      {/* Product Details */}
+      <div className="flex-1 flex flex-col">
+        <h1 className="text-3xl font-bold">{product.title}</h1>
+        <p className="mt-2 text-gray-700">{product.description}</p>
+        <p className="text-xl font-semibold mt-4">Rs {product.price}</p>
+        <p className="mt-2 text-sm">
+          {product.stock > 0 ? "In stock" : "Out of stock"}
+        </p>
+
+        {/* Add to Cart Button */}
+        <div className="mt-4 w-1/2">
+          <AddToCartButton productId={product._id} stock={product.stock} />
+        </div>
+
+        <button
+          onClick={() => router.back()}
+          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 w-1/2"
+        >
+          Go Back
+        </button>
+      </div>
     </div>
   );
 }
