@@ -1,5 +1,4 @@
 "use client";
-
 import { useRouter } from "next/navigation";
 
 interface Props {
@@ -11,19 +10,19 @@ export default function BuyNowButton({ productId, price }: Props) {
   const router = useRouter();
 
   const handleBuyNow = () => {
-    if (!productId || !price) {
-      alert("Product info missing!");
-      return;
-    }
+    // localStorage me product save karo
+    localStorage.setItem(
+      "checkoutProducts",
+      JSON.stringify([{ productId, quantity: 1 }])
+    );
 
-    // Navigate to checkout page with query params
-    router.push(`/checkout/${productId}?price=${price}`);
+    router.push("/checkout");
   };
 
   return (
     <button
       onClick={handleBuyNow}
-      className="bg-blue-600 text-white px-4 py-2 rounded flex-1"
+      className="bg-blue-500 text-white px-3 py-1 rounded"
     >
       Buy Now
     </button>

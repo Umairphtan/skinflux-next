@@ -1,69 +1,65 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { buyNow } from "@/services/order";
+import { Shipping } from "@/types/order";
 
 interface Props {
-  productId: string;
-  quantity: number;
-  totalPrice: number;
+  onSubmit: (shipping: Shipping) => void;
 }
 
-export default function ShipmentForm({ productId, quantity, totalPrice }: Props) {
-  const router = useRouter();
-  const [address, setAddress] = useState("");
-  const [city, setCity] = useState("");
-  const [phone, setPhone] = useState("");
-  const [loading, setLoading] = useState(false);
+export default function ShippingForm({ onSubmit }: Props) {
+  const [shipping, setShipping] = useState<Shipping>({
+    name: "",
+    phone: "",
+    address: "",
+    city: "",
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!address || !city || !phone) return alert("Sab fields fill karein");
-
-    setLoading(true);
-    try {
-      await buyNow({
-        products: [{ productId, quantity }],
-        totalPrice,
-        address,
-        city,
-        phone,
-      });
-      alert("Order successfully placed!");
-      router.push("/orders");
-    } catch (err: any) {
-      console.error(err);
-      alert(err?.response?.data?.message || "Something went wrong");
-    } finally {
-      setLoading(false);
-    }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setShipping({ ...shipping, [e.target.name]: e.target.value });
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-3 max-w-md mx-auto mt-6">
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        onSubmit(shipping);
+      }}
+      className="flex flex-col gap-2"
+    >
       <input
-        value={address}
-        onChange={(e) => setAddress(e.target.value)}
+        name="name"
+        placeholder="Full Name"
+        value={shipping.name}
+        onChange={handleChange}
+        className="border p-2 rounded"
+        required
+      />
+      <input
+        name="phone"
+        placeholder="Phone Number"
+        value={shipping.phone}
+        onChange={handleChange}
+        className="border p-2 rounded"
+        required
+      />
+      <input
+        name="address"
         placeholder="Address"
-        required
+        value={shipping.address}
+        onChange={handleChange}
         className="border p-2 rounded"
+        required
       />
       <input
-        value={city}
-        onChange={(e) => setCity(e.target.value)}
+        name="city"
         placeholder="City"
-        required
+        value={shipping.city}
+        onChange={handleChange}
         className="border p-2 rounded"
-      />
-      <input
-        value={phone}
-        onChange={(e) => setPhone(e.target.value)}
-        placeholder="Phone"
         required
-        className="border p-2 rounded"
       />
-      <button type="submit" disabled={loading} className="bg-green-600 text-white p-2 rounded">
-        {loading ? "Placing..." : "Place Order"}
+      <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">
+        Continue to Payment
       </button>
     </form>
   );
