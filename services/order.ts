@@ -1,22 +1,29 @@
+// services/order.ts
 import API from "../libs/axios";
 
-export const buyNow = async (payload: {
-  products: { productId: string; quantity: number }[];
-  totalPrice: number;
+export interface OrderProduct {
+  productId: string;
+  quantity: number;
+}
+
+export interface Shipping {
+  name: string;
+  phone: string;
   address: string;
   city: string;
-  phone: string;
+}
+
+export const createOrder = async (data: {
+  products: OrderProduct[];
+  shipping: Shipping;
+  paymentMethod: "COD" | "BANK";
+  bankAccount?: string;
 }) => {
-  const res = await API.post("/order/buy-now", payload);
+  const res = await API.post("/order", data);
   return res.data;
 };
 
-export const getUserOrders = async () => {
-  const res = await API.get("/order/my-orders");
-  return res.data.orders;
-};
-
-export const getAllOrders = async () => {
-  const res = await API.get("/order/orders");
-  return res.data.orders;
+export const getMyOrders = async () => {
+  const res = await API.get("/order/my");
+  return res.data;
 };

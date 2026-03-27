@@ -1,34 +1,25 @@
-export interface ProductItem {
+export interface Shipping {
+  name: string;
+  phone: string;
+  address: string;
+  city: string;
+}
+
+export interface OrderProduct {
   productId: string;
   quantity: number;
 }
 
 export interface Order {
-  _id: string;
-  user: string;
-  products: ProductItem[];
+  _id?: string;
+  user?: string;
+  products: OrderProduct[];
   totalPrice: number;
-  status: "pending" | "completed" | "cancelled";
-  createdAt: string;
-}
-
-export interface Shipment {
-  _id: string;
-  order: string;
-  address: string;
-  city: string;
-  phone: string;
-  courier: string;
-  status: "pending" | "shipped" | "delivered";
-  shippedAt?: string;
-  deliveredAt?: string;
-}
-
-export interface BuyNowPayload {
-  userId: string;
-  products: ProductItem[];
-  totalPrice: number;
-  address: string;
-  city: string;
-  phone: string;
+  shipping: Shipping;
+  paymentMethod: "COD" | "BANK";
+  bankAccount?: string;
+  paymentStatus?: "pending" | "paid";
+  orderStatus?: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+  createdAt?: string;
+  updatedAt?: string;
 }

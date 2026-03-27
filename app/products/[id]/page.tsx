@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { getProductById } from "@/services/product";
 import { Product } from "@/types/product";
-import AddToCartButton from "@/components/addtocartbtn"; 
+import AddToCartButton from "@/components/addtocartbtn";
+import BuyNowButton from "@/components/buynow";
 
 export default function ProductPage() {
   const { id } = useParams() as { id?: string };
@@ -62,11 +63,13 @@ export default function ProductPage() {
           {product.stock > 0 ? "In stock" : "Out of stock"}
         </p>
 
-        {/* Add to Cart Button */}
-        <div className="mt-4 w-1/2">
+        {/* Buttons: Add to Cart + Buy Now */}
+        <div className="mt-4 flex gap-4 w-full md:w-1/2">
           <AddToCartButton productId={product._id} stock={product.stock} />
+          <BuyNowButton productId={product._id} price={product.price} />
         </div>
 
+        {/* Go Back Button */}
         <button
           onClick={() => router.back()}
           className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 w-1/2"

@@ -1,79 +1,62 @@
 "use client";
-
 import { useEffect, useState } from "react";
-import { getCart, updateCart, removeCart } from "@/services/cart";
-import CartItem from "@/components/cart";
-import { CartItem as Item } from "@/types/cart";
+import { getCart, updateCart, removeCart, CartItem } from "@/services/cart";
+import CartItemComponent from "@/components/cart";
+import { useRouter } from "next/navigation";
 
 export default function CartPage() {
-  const [cart, setCart] = useState<Item[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetchCart = async () => {
-    try {
-      const res = await getCart();
-      setCart(res.cart);
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
-    fetchCart();
+    getCart().then(res => setCart(res.cart || []));
   }, []);
 
   const handleUpdate = async (id: string, qty: number) => {
-    if (qty < 1) return;
-
-    try {
-      await updateCart(id, qty);
-      fetchCart();
-    } catch (err) {
-      console.log(err);
-    }
+    await updateCart(id, qty);
+    setCart(prev => prev.map(i => i._id === id ? { ...i, quantity: qty } : i));
   };
 
   const handleRemove = async (id: string) => {
-    try {
-      await removeCart(id);
-      fetchCart();
-    } catch (err) {
-      console.log(err);
-    }
+    await removeCart(id);
+    setCart(prev => prev.filter(i => i._id !== id));
   };
 
-  const total = cart.reduce(
-    (acc, item) => acc + item.product.price * item.quantity,
-    0
-  );
+  const handleCheckout = () => {
+    if(cart.length === 0){
+      alert("Cart is empty");
+      return;
+    }
 
-  if (loading) return <p className="text-center mt-10">Loading...</p>;
+    const products = cart.map(i => ({
+      productId: i.product._id,
+      quantity: i.quantity
+    }));
+
+    // save to localStorage
+    localStorage.setItem("checkoutProducts", JSON.stringify(products));
+    router.push("/checkout");
+  };
 
   return (
-    <div className="min-h-screen bg-pink-50 p-6">
-      <h1 className="text-2xl font-bold text-pink-600 mb-6">
-        Your Cart 🛒
-      </h1>
+    <div className="p-6">
+      {cart.map(item => (
+        <CartItemComponent
+          key={item._id}
+          item={item}
+          onUpdate={handleUpdate}
+          onRemove={handleRemove}
+        />
+      ))}
 
-      <div className="space-y-4">
-        {cart.map((item) => (
-          <CartItem
-            key={item._id}
-            item={item}
-            onUpdate={handleUpdate}
-            onRemove={handleRemove}
-          />
-        ))}
-      </div>
+      <h2>Total: Rs {cart.reduce((acc, i) => acc + i.product.price * i.quantity, 0)}</h2>
 
-      {/* Total */}
-      <div className="mt-6 bg-white p-4 rounded-xl shadow">
-        <h2 className="text-lg font-semibold">
-          Total: Rs. {total}
-        </h2>
-      </div>
+      <button
+        onClick={handleCheckout}
+        className="bg-green-500 text-white px-4 py-2 rounded mt-2"
+      >
+        Checkout
+      </button>
     </div>
   );
 }
