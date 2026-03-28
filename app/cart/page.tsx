@@ -14,7 +14,9 @@ export default function CartPage() {
 
   const handleUpdate = async (id: string, qty: number) => {
     await updateCart(id, qty);
-    setCart(prev => prev.map(i => i._id === id ? { ...i, quantity: qty } : i));
+    setCart(prev =>
+      prev.map(i => (i._id === id ? { ...i, quantity: qty } : i))
+    );
   };
 
   const handleRemove = async (id: string) => {
@@ -23,7 +25,7 @@ export default function CartPage() {
   };
 
   const handleCheckout = () => {
-    if(cart.length === 0){
+    if (cart.length === 0) {
       alert("Cart is empty");
       return;
     }
@@ -33,30 +35,59 @@ export default function CartPage() {
       quantity: i.quantity
     }));
 
-    // save to localStorage
     localStorage.setItem("checkoutProducts", JSON.stringify(products));
     router.push("/checkout");
   };
 
+  const total = cart.reduce(
+    (acc, i) => acc + i.product.price * i.quantity,
+    0
+  );
+
   return (
-    <div className="p-6">
-      {cart.map(item => (
-        <CartItemComponent
-          key={item._id}
-          item={item}
-          onUpdate={handleUpdate}
-          onRemove={handleRemove}
-        />
-      ))}
+    <div className="max-w-5xl mx-auto p-6">
+      <h1 className="text-2xl font-bold mb-6">🛒 Your Cart</h1>
 
-      <h2>Total: Rs {cart.reduce((acc, i) => acc + i.product.price * i.quantity, 0)}</h2>
+      {/* EMPTY CART */}
+      {cart.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 text-gray-500">
+          <div className="text-6xl mb-4">🛍️</div>
+          <p className="text-lg font-medium">Your cart is empty</p>
+          <p className="text-sm">Start adding products to see them here</p>
+        </div>
+      ) : (
+        <>
+          {/* CART ITEMS */}
+          <div className="space-y-4">
+            {cart.map(item => (
+              <div
+                key={item._id}
+                className="bg-white shadow-md rounded-xl p-4 border"
+              >
+                <CartItemComponent
+                  item={item}
+                  onUpdate={handleUpdate}
+                  onRemove={handleRemove}
+                />
+              </div>
+            ))}
+          </div>
 
-      <button
-        onClick={handleCheckout}
-        className="bg-green-500 text-white px-4 py-2 rounded mt-2"
-      >
-        Checkout
-      </button>
+          {/* TOTAL + CHECKOUT */}
+          <div className="mt-8 bg-gray-100 p-6 rounded-xl shadow-md flex justify-between items-center">
+            <h2 className="text-xl font-semibold">
+              Total: <span className="text-green-600">Rs {total}</span>
+            </h2>
+
+            <button
+              onClick={handleCheckout}
+              className="bg-green-500 hover:bg-green-600 transition text-white px-6 py-2 rounded-lg font-medium"
+            >
+              Proceed to Checkout →
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }
