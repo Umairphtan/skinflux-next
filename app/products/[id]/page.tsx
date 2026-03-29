@@ -46,33 +46,53 @@ export default function ProductPage() {
     : "/default.jpg";
 
   return (
-    <div className="p-6 mt-20 max-w-4xl mx-auto flex flex-col md:flex-row gap-6">
+    <div className="p-6 mt-20 max-w-5xl mx-auto flex flex-col md:flex-row gap-8 bg-white shadow-md rounded-lg">
       {/* Product Image */}
-      <img
-        src={imageUrl}
-        alt={product.title}
-        className="w-full md:w-1/2 h-96 object-cover rounded"
-      />
+      <div className="md:w-1/2">
+        <img
+          src={imageUrl}
+          alt={product.title}
+          className="w-full h-96 object-cover rounded-lg"
+        />
+      </div>
 
       {/* Product Details */}
-      <div className="flex-1 flex flex-col">
-        <h1 className="text-3xl font-bold">{product.title}</h1>
-        <p className="mt-2 text-gray-700">{product.description}</p>
-        <p className="text-xl font-semibold mt-4">Rs {product.price}</p>
-        <p className="mt-2 text-sm">
-          {product.stock > 0 ? "In stock" : "Out of stock"}
-        </p>
+      <div className="md:w-1/2 flex flex-col justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">{product.title}</h1>
+          <p className="text-gray-600 mt-1">
+            Category: <span className="font-medium">{product.category}</span>
+          </p>
+          <p className="text-xl font-semibold mt-4">Rs {product.price}</p>
+          <p className={`mt-2 ${product.stock > 0 ? "text-green-600" : "text-red-600"}`}>
+            {product.stock > 0 ? "In stock" : "Out of stock"}
+          </p>
 
-        {/* Buttons: Add to Cart + Buy Now */}
-        <div className="mt-4 flex gap-4 w-full md:w-1/2">
+          <div className="max-w-md mx-auto mt-6 p-4 border rounded-lg bg-gray-50 shadow-sm">
+            <h2 className="text-xl font-semibold mb-2">{product.title || "Product Title"}</h2>
+            <div
+              className="text-gray-700 breakwords"
+              style={{
+                whiteSpace: "pre-line",     // newline کو preserve کرے
+                overflowWrap: "anywhere",   // لمبی words wrap ہو جائیں
+                overflow: "hidden",          // scrollbars نہیں آئیں
+              }}
+            >
+              {product.description || "No description available"}
+            </div>
+          </div>
+        </div>
+
+        {/* Buttons */}
+        <div className="mt-6 flex flex-col sm:flex-row gap-4">
           <AddToCartButton productId={product._id} stock={product.stock} />
           <BuyNowButton productId={product._id} price={product.price} />
         </div>
 
-        {/* Go Back Button */}
+        {/* Go Back */}
         <button
           onClick={() => router.back()}
-          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 w-1/2"
+          className="mt-6 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 w-1/2"
         >
           Go Back
         </button>
