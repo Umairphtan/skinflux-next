@@ -3,7 +3,7 @@ import { Product } from "@/types/product";
 
 // Get all products
 export const getAllProducts = async (): Promise<Product[]> => {
-  const res = await API.get("/product/");
+  const res = await API.get("/product"); // baseURL = http://localhost:5000/api
   return res.data.data;
 };
 
