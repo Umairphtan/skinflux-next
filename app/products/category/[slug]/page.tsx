@@ -79,7 +79,7 @@ export default function CategoryPage() {
               >
                 <Link
                   href={`/products/${product._id}`}
-                  className="cursor-pointer flex-shrink-0"
+                  className="cursor-pointer "
                 >
                   <img
                     src={imageUrl}
