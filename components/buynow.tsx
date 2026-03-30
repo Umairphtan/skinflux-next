@@ -20,9 +20,18 @@ export default function BuyNowButton({ productId, price }: Props) {
   };
 
   return (
-    <button
+      <button
       onClick={handleBuyNow}
-      className="bg-blue-500 text-white px-3 py-1 rounded"
+      className="
+        bg-gray-800 text-white
+        px-2 py-1   /* very compact */
+        text-sm font-medium
+        rounded
+        shadow-sm
+        hover:bg-gray-900 hover:shadow-md
+        transition-all duration-200
+        focus:outline-none focus:ring-1 focus:ring-gray-500
+      "
     >
       Buy Now
     </button>
