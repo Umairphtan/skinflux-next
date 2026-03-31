@@ -7,13 +7,16 @@ import { getCategoryProducts } from "@/services/product";
 import { Product } from "@/types/product";
 import AddToCartButton from "@/components/addtocartbtn";
 import BuyNowButton from "@/components/buynow";
-import { motion } from "framer-motion";
 
 export default function CategoryPage() {
   const { slug } = useParams() as { slug?: string };
+
   const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [expandedIds, setExpandedIds] = useState<string[]>([]); // for Read More
+
+  const [search, setSearch] = useState("");
+  const [priceSort, setPriceSort] = useState("none");
 
   useEffect(() => {
     if (!slug) return;
@@ -23,8 +26,9 @@ export default function CategoryPage() {
       try {
         const data = await getCategoryProducts(slug);
         setProducts(data);
+        setFilteredProducts(data);
       } catch (err) {
-        console.error("Category Error:", err);
+        console.error(err);
         setProducts([]);
       } finally {
         setLoading(false);
@@ -34,109 +38,134 @@ export default function CategoryPage() {
     fetchProducts();
   }, [slug]);
 
-  const toggleExpand = (id: string) => {
-    setExpandedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    );
-  };
+  // 🔹 Search + Sort
+  useEffect(() => {
+    let filtered = [...products];
+
+    if (search) {
+      filtered = filtered.filter((p) =>
+        p.title.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+
+    if (priceSort === "low") {
+      filtered.sort((a, b) => (a.price || 0) - (b.price || 0));
+    } else if (priceSort === "high") {
+      filtered.sort((a, b) => (b.price || 0) - (a.price || 0));
+    }
+
+    setFilteredProducts(filtered);
+  }, [search, priceSort, products]);
 
   if (loading)
-    return (
-      <div className="p-6 mt-20 text-center text-gray-600 font-semibold">
-        Loading...
-      </div>
-    );
+    return <p className="text-center mt-10">Loading...</p>;
 
   return (
-    <div className="p-6 mt-20 max-w-7xl mx-auto">
-      <h1 className="text-3xl font-bold capitalize mb-8 text-gray-800">
-        {slug} Products
-      </h1>
+    <div className="min-h-screen bg-gray-50">
 
-      {products.length === 0 ? (
-        <p className="text-gray-500 text-center mt-20 text-lg">
-          No products found
-        </p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 auto-rows-fr">
-          {products.map((product, index) => {
-            const imageUrl = product.image
-              ? product.image.startsWith("http")
-                ? product.image
-                : `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/${product.image}`
-              : "/default.jpg";
+      {/* 🔹 Banner */}
+      <div className="bg-pink-400 text-white py-8 text-center">
+        <h1 className="text-2xl md:text-3xl font-bold capitalize">
+          {slug} Products
+        </h1>
+      </div>
 
-            const isExpanded = expandedIds.includes(product._id);
+      {/* 🔹 Layout */}
+      <div className="flex flex-col md:flex-row gap-4 px-3 sm:px-6 mt-6">
 
-            return (
-              <motion.div
-                key={product._id}
-                className="bg-white border rounded-xl shadow-lg overflow-hidden flex flex-col"
-                whileHover={{ y: -5, boxShadow: "0px 10px 20px rgba(0,0,0,0.2)" }}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05, duration: 0.3 }}
-              >
-                <Link
-                  href={`/products/${product._id}`}
-                  className="cursor-pointer "
-                >
-                  <img
-                    src={imageUrl}
-                    alt={product.title}
-                    className="h-56 w-full object-cover transition-transform duration-300 hover:scale-105"
-                  />
-                  <div className="p-4">
-                    <h2 className="font-semibold text-lg text-gray-800 truncate">
-                      {product.title}
-                    </h2>
-                    <p className="text-pink-600 font-bold text-md mt-1">
+    
+        <div className="w-full md:w-64 bg-white p-4 rounded-lg shadow h-fit">
+          <h2 className="font-semibold mb-3">Filters</h2>
+
+          {/* Search */}
+          <input
+            type="text"
+            placeholder="Search..."
+            className="w-full mb-3 px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-400 outline-none"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+
+          {/* Price Sort */}
+          <select
+            className="w-full px-3 py-2 border rounded-lg text-sm"
+            value={priceSort}
+            onChange={(e) => setPriceSort(e.target.value)}
+          >
+            <option value="none">Sort Price</option>
+            <option value="low">Low → High</option>
+            <option value="high">High → Low</option>
+          </select>
+        </div>
+
+        {/* 🔸 Products */}
+        <div className="flex-1">
+
+          {filteredProducts.length === 0 ? (
+            <p className="text-center mt-20 text-gray-500">
+              No products found
+            </p>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
+
+              {filteredProducts.map((product) => {
+                const imageUrl = product.image
+                  ? product.image.startsWith("http")
+                    ? product.image
+                    : `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/${product.image}`
+                  : "/default.jpg";
+
+                return (
+                  <div
+                    key={product._id}
+                    className="bg-white rounded-xl shadow-sm hover:shadow-md transition p-3 flex flex-col"
+                  >
+                    {/* Image */}
+                    <Link href={`/products/${product._id}`}>
+                      <img
+                        src={imageUrl}
+                        className="w-full h-32 sm:h-40 object-cover rounded-md"
+                      />
+                      <h2 className="text-sm font-medium mt-2 line-clamp-1">
+                        {product.title}
+                      </h2>
+                    </Link>
+
+                    {/* Price */}
+                    <p className="text-green-600 font-semibold text-sm mt-1">
                       Rs {product.price}
                     </p>
-                    <p className="text-gray-500 text-sm mt-1">
-                      Stock: {product.stock || 0}
+
+                    {/* Stock */}
+                    <p className="text-xs text-gray-500">
+                      {product.stock > 0
+                        ? `Stock: ${product.stock}`
+                        : "Sold Out"}
                     </p>
 
-                    {/* Description with Read More */}
-                    {product.description && (
-                      <p className="text-gray-600 text-sm mt-2">
-                        {isExpanded
-                          ? product.description
-                          : product.description.length > 60
-                          ? product.description.slice(0, 60) + "..."
-                          : product.description}
-                        {product.description.length > 60 && (
-                          <button
-                            className="text-pink-600 font-medium ml-1"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              toggleExpand(product._id);
-                            }}
-                          >
-                            {isExpanded ? "Show Less" : "Read More"}
-                          </button>
-                        )}
-                      </p>
-                    )}
+                    {/* Buttons */}
+                    <div className="flex gap-2 mt-auto">
+                      <div className="flex-1">
+                        <AddToCartButton
+                          productId={product._id}
+                          stock={product.stock || 0}
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <BuyNowButton
+                          productId={product._id}
+                          price={product.price || 0}
+                        />
+                      </div>
+                    </div>
                   </div>
-                </Link>
+                );
+              })}
 
-                {/* Buttons */}
-                <div className="p-4 mt-auto flex gap-2">
-                  <AddToCartButton
-                    productId={product._id}
-                    stock={product.stock || 0}
-                  />
-                  <BuyNowButton
-                    productId={product._id}
-                    price={product.price || 0}
-                  />
-                </div>
-              </motion.div>
-            );
-          })}
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
