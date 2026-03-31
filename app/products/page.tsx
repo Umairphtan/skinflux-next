@@ -11,130 +11,147 @@ export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [search, setSearch] = useState<string>("");
+
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("all");
+  const [priceSort, setPriceSort] = useState("none");
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const data = await getAllProducts();
-        setProducts(data);
-        setFilteredProducts(data);
-      } catch (err: any) {
-        setError(err.message || "Something went wrong");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProducts();
+    getAllProducts().then((data) => {
+      setProducts(data);
+      setFilteredProducts(data);
+      setLoading(false);
+    });
   }, []);
 
-  // 🔹 Filter products as user types
   useEffect(() => {
-    if (!search) {
-      setFilteredProducts(products);
-    } else {
-      const filtered = products.filter((p) =>
+    let filtered = [...products];
+
+    if (search) {
+      filtered = filtered.filter((p) =>
         p.title.toLowerCase().includes(search.toLowerCase())
       );
-      setFilteredProducts(filtered);
     }
-  }, [search, products]);
+
+    if (category !== "all") {
+      filtered = filtered.filter((p) => p.category === category);
+    }
+
+    if (priceSort === "low") {
+      filtered.sort((a, b) => (a.price || 0) - (b.price || 0));
+    } else if (priceSort === "high") {
+      filtered.sort((a, b) => (b.price || 0) - (a.price || 0));
+    }
+
+    setFilteredProducts(filtered);
+  }, [search, category, priceSort, products]);
+
+  const categories = Array.from(
+    new Set(products.map((p) => p.category))
+  ).filter(Boolean);
 
   if (loading)
-    return <p className="text-center mt-10 text-gray-600">Loading products...</p>;
-  if (error)
-    return <p className="text-center mt-10 text-red-500 font-medium">{error}</p>;
+    return <p className="text-center mt-10">Loading...</p>;
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* 🔹 Top Banner */}
-      <div className="w-full bg-indigo-700 py-12 text-center text-white mb-8 shadow-md">
-        <h1 className="text-3xl md:text-4xl font-bold tracking-wide">
-          Our Products
-        </h1>
-        <p className="text-sm md:text-base mt-2 text-indigo-200">
-          Explore our latest collection of products
-        </p>
+
+  
+      <div className="bg-indigo-700 text-white py-8 text-center">
+        <h1 className="text-2xl md:text-3xl font-bold">Our Products</h1>
       </div>
 
-      {/* 🔹 Search Bar */}
-      <div className="max-w-md mx-auto mb-6 px-6">
-        <input
-          type="text"
-          placeholder="Search products by title..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full border rounded-lg px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
-        />
-      </div>
+    
+      <div className="flex flex-col md:flex-row gap-4 px-3 sm:px-6 mt-6">
 
-      {/* 🔹 Products Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-6 pb-12">
-        {filteredProducts.length === 0 ? (
-          <p className="col-span-full text-center text-gray-500 mt-10">
-            No products found
-          </p>
-        ) : (
-          filteredProducts.map((product) => (
-            <div
-              key={product._id}
-              className="border p-4 rounded-lg shadow hover:shadow-lg transition flex flex-col bg-white"
-              style={{ height: "450px" }}
-            >
-              {/* Image + Title */}
-              <Link href={`/products/${product._id}`} className="cursor-pointer">
-                <img
-                  src={
-                    product.image
-                      ? `http://localhost:5000/uploads/${product.image}`
-                      : "/default.jpg"
-                  }
-                  alt={product.title}
-                  className="w-full h-48 object-cover mb-4 rounded"
-                />
-                <h2 className="font-bold text-lg truncate">{product.title}</h2>
-              </Link>
+      
+        <div className="w-full md:w-64 bg-white p-4 rounded-lg shadow h-fit">
+          <h2 className="font-semibold mb-3">Filters</h2>
 
-              <p className="text-gray-600 text-sm">{product.category}</p>
-              <p className="text-green-600 font-semibold mt-1">
-                ${product.price.toFixed(2)}
-              </p>
+          {/* Search */}
+          <input
+            type="text"
+            placeholder="Search..."
+            className="w-full mb-3 px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-400 outline-none"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
 
-              {/* Stock */}
-              {product.stock && product.stock > 0 ? (
-                <p className="text-gray-500 text-sm mt-1">Stock: {product.stock}</p>
-              ) : (
-                <p className="text-red-600 font-bold text-sm mt-1">Sold Out</p>
-              )}
+    
+          <select
+            className="w-full mb-3 px-3 py-2 border rounded-lg text-sm"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+          >
+            <option value="all">All Categories</option>
+            {categories.map((c) => (
+              <option key={c}>{c}</option>
+            ))}
+          </select>
+          <select
+            className="w-full px-3 py-2 border rounded-lg text-sm"
+            value={priceSort}
+            onChange={(e) => setPriceSort(e.target.value)}
+          >
+            <option value="none">Sort Price</option>
+            <option value="low">Low → High</option>
+            <option value="high">High → Low</option>
+          </select>
+        </div>
 
-              {/* Description */}
-              <p
-                className="text-gray-700 text-sm mt-2 overflow-hidden flex-grow"
-                style={{
-                  display: "-webkit-box",
-                  WebkitLineClamp: 6,
-                  WebkitBoxOrient: "vertical",
-                }}
+        <div className="flex-1">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+
+            {filteredProducts.map((product) => (
+              <div
+                key={product._id}
+                className="bg-white rounded-xl shadow-sm hover:shadow-md transition p-3 flex flex-col"
               >
-                {product.description || "No description available"}
-              </p>
+                {/* Image */}
+                <Link href={`/products/${product._id}`}>
+                  <img
+                    src={
+                      product.image
+                        ? `http://localhost:5000/uploads/${product.image}`
+                        : "/default.jpg"
+                    }
+                    className="w-full h-32 sm:h-40 object-fill rounded-md"
+                  />
+                  <h2 className="text-sm font-medium mt-2 line-clamp-1">
+                    {product.title}
+                  </h2>
+                </Link>
 
-              {/* Buttons */}
-              <div className="flex gap-2 mt-4">
-                <AddToCartButton
-                  productId={product._id}
-                  stock={product.stock || 0}
-                />
-                <BuyNowButton
-                  productId={product._id}
-                  price={product.price || 0}
-                />
+                {/* Price */}
+                <p className="text-green-600 font-semibold text-sm mt-1">
+                  ${product.price}
+                </p>
+
+                {/* Stock */}
+                <p className="text-xs text-gray-500">
+                  {product.stock > 0 ? `Stock: ${product.stock}` : "Sold Out"}
+                </p>
+
+                {/* Buttons */}
+                <div className="flex gap-2 mt-auto">
+                  <div className="flex-1">
+                    <AddToCartButton
+                      productId={product._id}
+                      stock={product.stock || 0}
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <BuyNowButton
+                      productId={product._id}
+                      price={product.price || 0}
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-          ))
-        )}
+            ))}
+
+          </div>
+        </div>
       </div>
     </div>
   );

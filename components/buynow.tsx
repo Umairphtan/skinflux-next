@@ -1,4 +1,5 @@
 "use client";
+
 import { useRouter } from "next/navigation";
 
 interface Props {
@@ -6,34 +7,31 @@ interface Props {
   price: number;
 }
 
-export default function BuyNowButton({ productId, price }: Props) {
+export default function BuyNowButton({ productId }: Props) {
   const router = useRouter();
 
   const handleBuyNow = () => {
-    // localStorage me product save karo
     localStorage.setItem(
       "checkoutProducts",
       JSON.stringify([{ productId, quantity: 1 }])
     );
-
     router.push("/checkout");
   };
 
   return (
-      <button
+    <button
       onClick={handleBuyNow}
       className="
-        bg-gray-800 text-white
-        px-2 py-1   /* very compact */
-        text-sm font-medium
-        rounded
-        shadow-sm
-        hover:bg-gray-900 hover:shadow-md
+        w-full h-10 sm:h-11
+        text-xs sm:text-sm font-medium
+        rounded-md
+        bg-gray-900 text-white
+        hover:bg-black
         transition-all duration-200
-        focus:outline-none focus:ring-1 focus:ring-gray-500
+        flex items-center justify-center
       "
     >
-      Buy Now
+      Buy
     </button>
   );
 }
