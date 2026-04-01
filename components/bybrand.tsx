@@ -6,7 +6,7 @@ import Link from "next/link";
 
 type Brand = {
   name: string;
-  logo: string; // image path ya URL
+  logo: string; // image path or URL
   href: string; // brand filter page
 };
 
@@ -21,28 +21,35 @@ const brands: Brand[] = [
 
 export default function ShopByBrand() {
   return (
-    <section className="max-w-7xl mx-auto px-6 py-20 bg-gray-50">
-      <h2 className="text-4xl font-extrabold text-center text-pink-600 mb-16">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-gray-50">
+      <h2 className="text-3xl sm:text-4xl font-extrabold text-center text-pink-600 mb-12">
         Shop by Brand
       </h2>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-8">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 sm:gap-8">
         {brands.map((brand, idx) => (
           <motion.div
             key={idx}
-            whileHover={{ scale: 1.08 }}
+            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="bg-white p-6 rounded-2xl shadow-lg flex flex-col items-center justify-center cursor-pointer transition duration-300 hover:shadow-2xl"
+            className="
+              bg-white rounded-3xl shadow-lg
+              p-4 sm:p-6
+              flex flex-col items-center justify-center
+              cursor-pointer
+              transition duration-300
+              hover:shadow-2xl
+            "
           >
             <Link href={brand.href} className="flex flex-col items-center">
-              <div className="w-32 h-32 md:w-40 md:h-40 flex items-center justify-center mb-4">
+              <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 flex items-center justify-center mb-3 sm:mb-4">
                 <img
                   src={brand.logo}
                   alt={brand.name}
                   className="object-contain h-full w-full"
                 />
               </div>
-              <span className="text-lg font-semibold text-gray-700 text-center">
+              <span className="text-sm sm:text-base md:text-lg font-semibold text-gray-700 text-center">
                 {brand.name}
               </span>
             </Link>

@@ -45,24 +45,25 @@ export default function CartPage() {
   );
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">🛒 Your Cart</h1>
+    <div className="min-h-screen bg-gray-100 py-6 px-4 md:px-10">
+      <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center md:text-left">
+        🛒 Your Cart
+      </h1>
 
-      {/* EMPTY CART */}
       {cart.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-gray-500">
           <div className="text-6xl mb-4">🛍️</div>
           <p className="text-lg font-medium">Your cart is empty</p>
-          <p className="text-sm">Start adding products to see them here</p>
+          <p className="text-sm mt-1">Start adding products to see them here</p>
         </div>
       ) : (
-        <>
-          {/* CART ITEMS */}
-          <div className="space-y-4">
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Cart Items */}
+          <div className="flex-1 space-y-4">
             {cart.map(item => (
               <div
                 key={item._id}
-                className="bg-white shadow-md rounded-xl p-4 border"
+                className="bg-white shadow-md rounded-xl p-4 flex flex-col md:flex-row items-center gap-4 border hover:shadow-lg transition"
               >
                 <CartItemComponent
                   item={item}
@@ -73,20 +74,30 @@ export default function CartPage() {
             ))}
           </div>
 
-          {/* TOTAL + CHECKOUT */}
-          <div className="mt-8 bg-gray-100 p-6 rounded-xl shadow-md flex justify-between items-center">
-            <h2 className="text-xl font-semibold">
-              Total: <span className="text-green-600">Rs {total}</span>
-            </h2>
+          {/* Order Summary */}
+          <div className="lg:w-80 bg-white rounded-xl shadow-md p-6 flex flex-col gap-4">
+            <h2 className="text-xl font-semibold text-gray-800">Order Summary</h2>
+            <div className="flex justify-between text-gray-700 font-medium">
+              <span>Subtotal:</span>
+              <span>Rs {total}</span>
+            </div>
+            <div className="flex justify-between text-gray-700 font-medium">
+              <span>Shipping:</span>
+              <span>Rs 0</span>
+            </div>
+            <div className="border-t border-gray-300 pt-3 flex justify-between text-lg font-bold">
+              <span>Total:</span>
+              <span>Rs {total}</span>
+            </div>
 
             <button
               onClick={handleCheckout}
-              className="bg-green-500 hover:bg-green-600 transition text-white px-6 py-2 rounded-lg font-medium"
+              className="mt-4 w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transition"
             >
               Proceed to Checkout →
             </button>
           </div>
-        </>
+        </div>
       )}
     </div>
   );
