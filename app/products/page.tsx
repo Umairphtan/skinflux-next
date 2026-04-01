@@ -56,15 +56,15 @@ export default function ProductsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
 
-  
+
       <div className="bg-indigo-700 text-white py-8 text-center">
         <h1 className="text-2xl md:text-3xl font-bold">Our Products</h1>
       </div>
 
-    
+
       <div className="flex flex-col md:flex-row gap-4 px-3 sm:px-6 mt-6">
 
-      
+
         <div className="w-full md:w-64 bg-white p-4 rounded-lg shadow h-fit">
           <h2 className="font-semibold mb-3">Filters</h2>
 
@@ -77,7 +77,7 @@ export default function ProductsPage() {
             onChange={(e) => setSearch(e.target.value)}
           />
 
-    
+
           <select
             className="w-full mb-3 px-3 py-2 border rounded-lg text-sm"
             value={category}
@@ -107,7 +107,7 @@ export default function ProductsPage() {
                 key={product._id}
                 className="bg-white rounded-xl shadow-sm hover:shadow-md transition p-3 flex flex-col"
               >
-                {/* Image */}
+                {/* Image + Title */}
                 <Link href={`/products/${product._id}`}>
                   <img
                     src={
@@ -115,25 +115,47 @@ export default function ProductsPage() {
                         ? `http://localhost:5000/uploads/${product.image}`
                         : "/default.jpg"
                     }
+                    alt={product.title}
                     className="w-full h-32 sm:h-40 object-fill rounded-md"
                   />
-                  <h2 className="text-sm font-medium mt-2 line-clamp-1">
+
+                  <h2 className="text-sm sm:text-base font-semibold text-gray-800 mt-2 line-clamp-1">
                     {product.title}
                   </h2>
                 </Link>
 
                 {/* Price */}
-                <p className="text-green-600 font-semibold text-sm mt-1">
-                  ${product.price}
+                <p className="text-pink-600 font-bold text-sm sm:text-base mt-1">
+                  Rs {product.price}
                 </p>
 
                 {/* Stock */}
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-500 font-medium">
                   {product.stock > 0 ? `Stock: ${product.stock}` : "Sold Out"}
                 </p>
 
+                {/* 🔹 Description (no overflow) */}
+                <p
+                  className="text-xs sm:text-sm text-gray-600 mt-1 overflow-hidden"
+                  style={{
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                  }}
+                >
+                  {product.description || "No description available"}
+                </p>
+
+                {/* 🔹 See More */}
+                <Link
+                  href={`/products/${product._id}`}
+                  className="text-pink-600 text-xs font-semibold mt-1 hover:underline"
+                >
+                  See More →
+                </Link>
+
                 {/* Buttons */}
-                <div className="flex gap-2 mt-auto">
+                <div className="flex gap-2 mt-auto pt-2">
                   <div className="flex-1">
                     <AddToCartButton
                       productId={product._id}

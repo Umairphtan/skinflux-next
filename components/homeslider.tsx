@@ -53,7 +53,7 @@ export default function HeroSlider() {
             alt="banner"
             fill
             priority
-            className="object-cover"
+            className="object-fill"
           />
 
           {/* GRADIENT OVERLAY (better than black) */}
