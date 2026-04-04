@@ -15,12 +15,17 @@ export default function ProductsPage() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [priceSort, setPriceSort] = useState("none");
+  const [maxPrice, setMaxPrice] = useState<number>(0);
 
   useEffect(() => {
     getAllProducts().then((data) => {
       setProducts(data);
       setFilteredProducts(data);
       setLoading(false);
+
+      // Initialize maxPrice
+      const max = data.reduce((m, p) => Math.max(m, p.price || 0), 0);
+      setMaxPrice(max);
     });
   }, []);
 
@@ -43,65 +48,88 @@ export default function ProductsPage() {
       filtered.sort((a, b) => (b.price || 0) - (a.price || 0));
     }
 
+    if (maxPrice) {
+      filtered = filtered.filter((p) => (p.price || 0) <= maxPrice);
+    }
+
     setFilteredProducts(filtered);
-  }, [search, category, priceSort, products]);
+  }, [search, category, priceSort, maxPrice, products]);
 
   const categories = Array.from(
     new Set(products.map((p) => p.category))
   ).filter(Boolean);
 
-  if (loading)
-    return <p className="text-center mt-10">Loading...</p>;
+  if (loading) return <p className="text-center mt-10">Loading...</p>;
 
   return (
     <div className="min-h-screen bg-gray-50">
-
-
+      {/* Banner */}
       <div className="bg-indigo-700 text-white py-8 text-center">
         <h1 className="text-2xl md:text-3xl font-bold">Our Products</h1>
       </div>
 
-
       <div className="flex flex-col md:flex-row gap-4 px-3 sm:px-6 mt-6">
+        {/* Filters Sidebar */}
+        <div className="w-full md:w-64 bg-white p-6 rounded-xl shadow-lg">
+          <div className="md:sticky md:top-6 max-h-screen overflow-y-auto">
+            <h2 className="font-semibold mb-4 text-lg text-gray-700">Filters</h2>
 
+            {/* Search */}
+            <input
+              type="text"
+              placeholder="Search..."
+              className="w-full mb-4 px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-400 outline-none"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
 
-        <div className="w-full md:w-64 bg-white p-4 rounded-lg shadow h-fit">
-          <h2 className="font-semibold mb-3">Filters</h2>
+            {/* Category */}
+            <label className="block mb-2 text-sm font-medium text-gray-600">
+              Category
+            </label>
+            <select
+              className="w-full mb-4 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+            >
+              <option value="all">All Categories</option>
+              {categories.map((c) => (
+                <option key={c}>{c}</option>
+              ))}
+            </select>
 
-          {/* Search */}
-          <input
-            type="text"
-            placeholder="Search..."
-            className="w-full mb-3 px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-400 outline-none"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+            {/* Price Range */}
+            <label className="block mb-2 text-sm font-medium text-gray-600">
+              Max Price: Rs {maxPrice}
+            </label>
+            <input
+              type="range"
+              min={0}
+              max={products.reduce((max, p) => Math.max(max, p.price || 0), 0)}
+              value={maxPrice || 0}
+              onChange={(e) => setMaxPrice(Number(e.target.value))}
+              className="w-full mb-4 accent-indigo-600"
+            />
 
-
-          <select
-            className="w-full mb-3 px-3 py-2 border rounded-lg text-sm"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          >
-            <option value="all">All Categories</option>
-            {categories.map((c) => (
-              <option key={c}>{c}</option>
-            ))}
-          </select>
-          <select
-            className="w-full px-3 py-2 border rounded-lg text-sm"
-            value={priceSort}
-            onChange={(e) => setPriceSort(e.target.value)}
-          >
-            <option value="none">Sort Price</option>
-            <option value="low">Low → High</option>
-            <option value="high">High → Low</option>
-          </select>
+            {/* Price Sort */}
+            <label className="block mb-2 text-sm font-medium text-gray-600">
+              Sort by Price
+            </label>
+            <select
+              className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              value={priceSort}
+              onChange={(e) => setPriceSort(e.target.value)}
+            >
+              <option value="none">Default</option>
+              <option value="low">Low → High</option>
+              <option value="high">High → Low</option>
+            </select>
+          </div>
         </div>
 
+        {/* Products Grid */}
         <div className="flex-1">
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-
             {filteredProducts.map((product) => (
               <div
                 key={product._id}
@@ -116,9 +144,8 @@ export default function ProductsPage() {
                         : "/default.jpg"
                     }
                     alt={product.title}
-                    className="w-full h-32 sm:h-40 object-fill rounded-md"
+                    className="w-full h-32 sm:h-40 object-cover rounded-md"
                   />
-
                   <h2 className="text-sm sm:text-base font-semibold text-gray-800 mt-2 line-clamp-1">
                     {product.title}
                   </h2>
@@ -134,7 +161,7 @@ export default function ProductsPage() {
                   {product.stock > 0 ? `Stock: ${product.stock}` : "Sold Out"}
                 </p>
 
-                {/* 🔹 Description (no overflow) */}
+                {/* Description */}
                 <p
                   className="text-xs sm:text-sm text-gray-600 mt-1 overflow-hidden"
                   style={{
@@ -146,7 +173,7 @@ export default function ProductsPage() {
                   {product.description || "No description available"}
                 </p>
 
-                {/* 🔹 See More */}
+                {/* See More */}
                 <Link
                   href={`/products/${product._id}`}
                   className="text-pink-600 text-xs font-semibold mt-1 hover:underline"
@@ -171,7 +198,6 @@ export default function ProductsPage() {
                 </div>
               </div>
             ))}
-
           </div>
         </div>
       </div>
