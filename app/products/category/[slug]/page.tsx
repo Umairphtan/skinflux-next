@@ -113,6 +113,8 @@ export default function CategoryPage() {
 
       </div>
 
+      
+
 
       <div className="flex flex-col md:flex-row gap-4 px-3 sm:px-6 mt-6">
 
@@ -200,6 +202,7 @@ export default function CategoryPage() {
             </div>
           )}
         </div>
+        
       </div>
     </div>
   );

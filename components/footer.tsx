@@ -31,9 +31,9 @@ export default function Footer() {
         <div>
           <h3 className="font-semibold mb-4">Contact</h3>
           <ul className="space-y-2 text-gray-400">
-            <li>📞 +92 300 000 0000</li>
-            <li>✉️ support@skinglow.com</li>
-            <li>🏢 123 Skincare Street, Karachi, Pakistan</li>
+            <li>📞 +92 326 0611 728</li>
+            <li>✉️ support@skinflux.gmail</li>
+            <li>🏢 31 A pir ghazi road ichra lahore, Pakistan</li>
           </ul>
         </div>
 
@@ -52,7 +52,7 @@ export default function Footer() {
 
       {/* COPYRIGHT */}
       <div className="border-t border-gray-700 mt-8 py-4 text-center text-gray-500 text-sm">
-        &copy; {new Date().getFullYear()} SkinGlow. All rights reserved.
+        &copy; {new Date().getFullYear()} Skinflux. All rights reserved.
       </div>
     </footer>
   )
