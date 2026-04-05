@@ -11,11 +11,19 @@ export default function BuyNowButton({ productId }: Props) {
   const router = useRouter();
 
   const handleBuyNow = () => {
+    // product temporarily save (guest + user dono ke liye)
     localStorage.setItem(
       "checkoutProducts",
       JSON.stringify([{ productId, quantity: 1 }])
     );
-    router.push("/checkout");
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      router.push("/login?redirect=/checkout");
+    } else {
+      router.push("/checkout");
+    }
   };
 
   return (
@@ -31,7 +39,7 @@ export default function BuyNowButton({ productId }: Props) {
         flex items-center justify-center
       "
     >
-      Buy
+      Buy Now
     </button>
   );
 }

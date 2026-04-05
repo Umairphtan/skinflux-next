@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useCart } from "@/context/cartcontext";
+import { addToGuestCart } from "@/libs/gusetcard";
 
 interface Props {
   productId: string;
@@ -16,16 +17,25 @@ export default function AddToCartButton({ productId, stock }: Props) {
   const handleAddToCart = async () => {
     if (stock === 0) return;
 
+    const token = localStorage.getItem("token");
+
     try {
       setLoading(true);
-      await addItem(productId, 1);
+
+      if (token) {
+        // ✅ Logged-in user → backend
+        await addItem(productId, 1);
+      } else {
+        // ✅ Guest user → localStorage
+        addToGuestCart(productId, 1);
+      }
 
       setAdded(true);
-      alert("Product added to cart ✅"); 
+      alert("Product added to cart ✅");
 
       setTimeout(() => setAdded(false), 2000);
     } catch (err: any) {
-      alert("Error adding product ");
+      alert("Error adding product");
     } finally {
       setLoading(false);
     }
@@ -53,4 +63,4 @@ export default function AddToCartButton({ productId, stock }: Props) {
       {loading ? "Adding..." : added ? "Added ✓" : "Add"}
     </button>
   );
-}
+} 
